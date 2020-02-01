@@ -20,6 +20,8 @@
 
 (defun hornet--clear-buffer (buffer)
   (when (get-buffer buffer)
+    (when (get-buffer-process (get-buffer buffer))
+      (delete-process buffer))
     (with-current-buffer buffer
       (setq buffer-read-only nil)
       (erase-buffer))))
@@ -28,6 +30,8 @@
   "*Hornet*")
 
 ;;; API
+
+;;; TODO: support the `addr` option.
 
 ;;;###autoload
 (defun hornet-test ()
