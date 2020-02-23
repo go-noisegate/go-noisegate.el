@@ -2,11 +2,14 @@
 
 (require 'compile)
 
-;;; group, but no options and faces so far
+;;; groups, customs, and vars
 
 (defgroup hornet nil
   "Hornet utility"
   :group 'go)
+
+(defvar hornet-history nil
+  "History list for args")
 
 ;;; mode
 
@@ -29,9 +32,13 @@
 (defun hornet--buffer-name (mode-name)
   "*Hornet*")
 
-;;; API
+(defun hornet--get-args (history)
+  (pcase current-prefix-arg
+    (`nil "")
+    (`-   (car (symbol-value history)))
+    (`(4) (read-shell-command "hornet args: " (car (symbol-value history)) history))))
 
-;;; TODO: support the `addr` option.
+;;; API
 
 ;;;###autoload
 (defun hornet-test ()
@@ -40,7 +47,7 @@
   (let ((buffer "*Hornet*"))
     (when (string-match "\.go$" buffer-file-name)
       (hornet--clear-buffer buffer)
-      (compilation-start (concat "hornet test " buffer-file-name)
+      (compilation-start (concat "hornet test " (hornet--get-args 'hornet-history) " " buffer-file-name ":#" (number-to-string (- (point) 1)))
                          'hornet-mode
                          'hornet--buffer-name)
       (with-current-buffer "*Hornet*"
