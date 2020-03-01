@@ -41,8 +41,15 @@
 ;;; API
 
 ;;;###autoload
+(defun hornet-hint ()
+  "Notifies the hornet of the change of the file in the current buffer. The current cursor is used as the offset."
+  (interactive)
+  (when (string-match "\.go$" buffer-file-name)
+    (start-process "hornet-hint" nil "hornet" "hint" (concat buffer-file-name ":#" (number-to-string (- (point) 1))))))
+
+;;;###autoload
 (defun hornet-test ()
-  "Run hornet tests for the package to which the current file belongs."
+  "Runs the tests based on the previous hints. The position of the current cursor is also used as the `hint`."
   (interactive)
   (let ((buffer "*Hornet*"))
     (when (string-match "\.go$" buffer-file-name)
