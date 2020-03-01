@@ -42,14 +42,14 @@
 
 ;;;###autoload
 (defun hornet-hint ()
-  "Notifies the hornet of the change of the file in the current buffer. The current cursor is used as the offset."
+  "Notifies the hornet server of the changed filename and position. The current cursor is used as the position."
   (interactive)
   (when (string-match "\.go$" buffer-file-name)
     (start-process "hornet-hint" nil "hornet" "hint" (concat buffer-file-name ":#" (number-to-string (- (point) 1))))))
 
 ;;;###autoload
 (defun hornet-test ()
-  "Runs the tests based on the previous hints. The position of the current cursor is also used as the `hint`."
+  "Runs tests based on the previous hints. The position of the current cursor is also used as the `hint`."
   (interactive)
   (let ((buffer "*Hornet*"))
     (when (string-match "\.go$" buffer-file-name)

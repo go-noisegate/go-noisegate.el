@@ -39,9 +39,9 @@ Here is the configuration to achieve this:
 
 The document below assumes you configured your editor in this way.
 
-## Tutorial
+## Quickstart
 
-In this tutorial, you will learn how to use the hornet to help your coding.
+This quickstart shows you how to use hornet to help your coding.
 
 ### Set up
 
@@ -121,3 +121,17 @@ You can use the prefix arg: type `C-u C-c C-h` and then enter `--tags tags,list`
 ### Run the same command as before
 
 It's bothersome to specify the same args again and again. To run the same command, specify `-` as the prefix arg: type `M-- C-c C-h` or `C-u - C-c C-h`.
+
+## Command reference
+
+`hornet.el` includes the following interactive commands.
+
+### hornet-hint
+
+Notifies the hornet server of the changed filename and position. The current cursor is used as the position.
+
+### hornet-test
+
+Runs tests based on the previous hints. The current cursor is also considered as one hint.
+
+Use the prefix arg to specify the args of the `hornet hint` cli command: `C-u M-x hornet-test` then you will be prompted. When the prefix arg is `-`, the value from the most recent history is used.
