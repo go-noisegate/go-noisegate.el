@@ -1,27 +1,42 @@
 # hornet.el
 
-Run hornet from Emacs.
+Run [hornet](https://github.com/ks888/hornet) from Emacs.
+
+## Features
+
+Hornet is the Golang test runner for the speedster.
+
+The core features are:
+* **Change-driven**: by the editor integration, hornet knows what changes you made and runs the tests affected by these changes first.
+* **Tuned for high-speed**: hornet implements some strategies to run the tests faster, including tests in parallel. You may disable these features for safety.
 
 ## Prerequisites
 
-* [Hornet](github.com/ks888/hornet) is installed.
+* Go 1.13 or later
+* Linux or Mac OS X
 
 ## Install
 
-Copy `hornet.el` to `load-path` and add the following snippets to your init file.
+1. Hornet has the server program (`hornetd`) and client program (`hornet`). Install both:
 
-```
-(require 'hornet)
-```
+   ```
+   $ go get -u github.com/ks888/hornet/cmd/hornet && go get -u github.com/ks888/hornet/cmd/hornetd
+   ```
 
-Or you may add the repository root to the `load-path`.
+2. Copy [`hornet.el`](https://raw.githubusercontent.com/ks888/hornet.el/master/hornet.el) to `load-path` and add the following snippets to your init file.
 
-```
-(add-to-list 'load-path "[the path to the repository root]")
-(require 'hornet)
-```
+   ```
+   (require 'hornet)
+   ```
 
-TODO: support MELPA
+   Or you may add the repository root to the `load-path`.
+
+   ```
+   (add-to-list 'load-path "[path to this repository]")
+   (require 'hornet)
+   ```
+
+   TODO: support MELPA
 
 ## Configuration
 
@@ -32,6 +47,8 @@ The typical configuration is:
 Here is the configuration to achieve this:
 
 ```
+(add-hook 'go-mode-hook
+          (lambda () (add-hook 'after-change-functions 'hornet-record-change)))
 (add-hook 'go-mode-hook
           (lambda () (add-hook 'after-save-hook 'hornet-hint)))
 (define-key go-mode-map (kbd "C-c C-h") 'hornet-test)
@@ -80,6 +97,8 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
 
    Obviously there is one failed test.
 
+   Also, the total test time is `1.032443223s` because the tests run in parallel. When you run the same tests using `go test`, it takes about 3 seconds.
+
 2. Fix the bug
 
    Fix the `SlowSub` function. `return a + b` at the line 12 should be `return a - b`. Then save it.
@@ -104,9 +123,7 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
    PASS (1.037108699s)
    ```
 
-   Based on the hint, hornet runs `TestSlowSub` first because it's affected by the previous change.
-
-   Note that the total test time is `1.033799777s` here because the tests run in parallel. When you run the same tests using `go test`, it will take about 3 seconds.
+   *Based on the hint, hornet runs `TestSlowSub` first because it's affected by the previous change.*
 
 ## How-to guides
 

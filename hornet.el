@@ -11,6 +11,9 @@
 (defvar hornet-history nil
   "History list for args")
 
+(defvar-local hornet-changes nil
+  "Change list [(begin, end)]")
+
 ;;; mode
 
 (define-derived-mode hornet-mode compilation-mode "Hornet"
@@ -38,23 +41,50 @@
     (`-   (car (symbol-value history)))
     (`(4) (read-shell-command "hornet args: " (car (symbol-value history)) history))))
 
+(defun hornet--get-offsets ()
+  (mapconcat (function (lambda (ch) (format "#%d-%d" (- (car ch) 1) (- (nth 1 ch) 1))))  ;; emacs offset is 1-based
+             hornet-changes ","))
+
+(defun hornet--record-change (begin end length)
+  "Record the change."
+  (let ((last-change (car hornet-changes)))
+    (if (and last-change (eq (nth 1 last-change) begin))
+      (setcar hornet-changes (list (car last-change) end))
+      (add-to-list 'hornet-changes (list begin end)))))
+
+(defun hornet--reset-changes ()
+  (setq hornet-changes nil))
+
 ;;; API
+
+;;;###autoload
+(defun hornet-record-change (begin end length)
+  "Record the change."
+  (interactive)
+  (when (string-suffix-p ".go" buffer-file-name)
+    (hornet--record-change begin end length)))
 
 ;;;###autoload
 (defun hornet-hint ()
   "Notifies the hornet server of the changed filename and position. The current cursor is used as the position."
   (interactive)
-  (when (string-match "\.go$" buffer-file-name)
-    (start-process "hornet-hint" nil "hornet" "hint" (concat buffer-file-name ":#" (number-to-string (- (point) 1))))))
+  (when (string-suffix-p ".go" buffer-file-name)
+    (hornet--record-change (point) (point) 0)
+    (let ((offsets (hornet--get-offsets)))
+      (hornet--reset-changes)
+      (start-process "hornet-hint" nil "hornet" "hint" (concat buffer-file-name ":" offsets)))))
 
 ;;;###autoload
 (defun hornet-test ()
   "Runs tests based on the previous hints. The position of the current cursor is also used as the `hint`."
   (interactive)
-  (let ((buffer "*Hornet*"))
-    (when (string-match "\.go$" buffer-file-name)
+  (when (string-suffix-p ".go" buffer-file-name)
+    (hornet--record-change (point) (point) 0)
+    (let ((buffer "*Hornet*")
+          (offsets (hornet--get-offsets)))
+      (hornet--reset-changes)
       (hornet--clear-buffer buffer)
-      (compilation-start (concat "hornet test " (hornet--get-args 'hornet-history) " " buffer-file-name ":#" (number-to-string (- (point) 1)))
+      (compilation-start (concat "hornet test " (hornet--get-args 'hornet-history) " " buffer-file-name ":" offsets)
                          'hornet-mode
                          'hornet--buffer-name)
       (with-current-buffer "*Hornet*"
