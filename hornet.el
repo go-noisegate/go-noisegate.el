@@ -46,11 +46,15 @@
              hornet-changes ","))
 
 (defun hornet--record-change (begin end length)
-  "Record the change."
-  (let ((last-change (car hornet-changes)))
-    (if (and last-change (eq (nth 1 last-change) begin))
-      (setcar hornet-changes (list (car last-change) end))
-      (add-to-list 'hornet-changes (list begin end)))))
+  "Record the change. Assumes [begin, end] (both inclusive)."
+  (if (> begin end)
+    (hornet--record-change end begin length)
+    (let ((last-change (car hornet-changes)))
+      (if (and last-change
+               (<= (car last-change) (+ end 1))
+               (<= (- begin 1) (nth 1 last-change)))
+          (setcar hornet-changes (list (min (car last-change) begin) (max (nth 1 last-change) end)))
+        (add-to-list 'hornet-changes (list begin end))))))
 
 (defun hornet--reset-changes ()
   (setq hornet-changes nil))
@@ -59,10 +63,10 @@
 
 ;;;###autoload
 (defun hornet-record-change (begin end length)
-  "Record the change."
+  "Record the change. [begin, end)"
   (interactive)
   (when (string-suffix-p ".go" buffer-file-name)
-    (hornet--record-change begin end length)))
+    (hornet--record-change begin (- end 1) length)))
 
 ;;;###autoload
 (defun hornet-hint ()
