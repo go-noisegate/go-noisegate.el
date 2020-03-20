@@ -66,7 +66,7 @@
 
 ;;;###autoload
 (defun hornet-hint ()
-  "Notifies the hornet server of the changed filename and position. The current cursor is used as the position."
+  "Sends the list of changes to the hornet server."
   (interactive)
   (when (string-suffix-p ".go" buffer-file-name)
     (hornet--record-change (point) (point) 0)
@@ -76,7 +76,7 @@
 
 ;;;###autoload
 (defun hornet-test ()
-  "Runs tests based on the previous hints. The position of the current cursor is also used as the `hint`."
+  "Runs the tests in the current package based on the previous hints."
   (interactive)
   (when (string-suffix-p ".go" buffer-file-name)
     (hornet--record-change (point) (point) 0)

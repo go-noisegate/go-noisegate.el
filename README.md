@@ -7,7 +7,7 @@ Run [hornet](https://github.com/ks888/hornet) from Emacs.
 Hornet is the Golang test runner for the speedster.
 
 The core features are:
-* **Change-driven**: by the editor integration, hornet knows what changes you made and runs the tests affected by these changes first.
+* **Change-driven**: by the integration with your editor, hornet knows what changes you made. It runs the tests affected by these changes first.
 * **Tuned for high-speed**: hornet implements some strategies to run the tests faster, including tests in parallel. You may disable these features for safety.
 
 ## Prerequisites
@@ -41,8 +41,9 @@ The core features are:
 ## Configuration
 
 The typical configuration is:
-* When the file is saved, automatically call `hornet hint` command, which notifies the hornet server of the changed filename and position.
-* When you want to run the test, type `C-c C-h`, which calls `hornet test` command. It runs the tests based on the previous hints.
+* While you edit a file, the plugin updates the list of changes you made.
+* When the file is saved, sends the list of changes to the hornet server.
+* To run the test, type `C-c C-h`, which calls `hornet-test` command. It runs the tests affected by your changes first and then runs the rest.
 
 Here is the configuration to achieve this:
 
@@ -80,7 +81,9 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
 
 1. Run the tests
 
-   Open `math.go` in the the repository root and type `C-c C-h`. It runs all the tests in the package. You will see the output like this:
+   Open `math.go` in the the repository root and type `C-c C-h` (or call the `hornet-test` command directly). It runs all the tests in the current package.
+
+   You will see the output like this:
 
    ```
    hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#31
@@ -101,9 +104,9 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
 
 2. Fix the bug
 
-   Fix the `SlowSub` function. `return a + b` at the line 12 should be `return a - b`. Then save it.
+   Fix [the `SlowSub` function](https://github.com/ks888/hornet-tutorial/blob/master/math.go#L12). `return a + b` at the line 12 should be `return a - b`. Then save it.
 
-   Now the `hornet hint` command automatically runs and it notifies the hornet server of the changed filename and position.
+   While you edit the file, the plugin updates the list of changes you made. When you save the file, it sends the list of changes to the hornet server.
 
 3. Run the tests again
 
@@ -139,16 +142,26 @@ You can use the prefix arg: type `C-u C-c C-h` and then enter `--tags tags,list`
 
 It's bothersome to specify the same args again and again. To run the same command, specify `-` as the prefix arg: type `M-- C-c C-h` or `C-u - C-c C-h`.
 
+### Run the specified test
+
+Simply type `C-c C-h` when the cursor points to the body of the target test.
+
+Before the tests run, the `hornet test` adds the position of the current cursor to the changes list, so that we can run the test to which the cursor points first without editing the file.
+
 ## Command reference
 
 `hornet.el` includes the following interactive commands.
 
+### hornet-record-change
+
+Record the change (the beginning and end of the region just changed).
+
 ### hornet-hint
 
-Notifies the hornet server of the changed filename and position. The current cursor is used as the position.
+Sends the list of changes to the hornet server.
 
 ### hornet-test
 
-Runs tests based on the previous hints. The current cursor is also considered as one hint.
+Runs the tests in the current package based on the previous hints.
 
 Use the prefix arg to specify the args of the `hornet hint` cli command: `C-u M-x hornet-test` then you will be prompted. When the prefix arg is `-`, the value from the most recent history is used.
