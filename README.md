@@ -83,24 +83,26 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
 
    Open `math.go` in the the repository root and type `C-c C-h` (or call the `hornet-test` command directly). It runs all the tests in the current package.
 
-   You will see the output like this:
-
    ```
-   hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#31
-   No important tests. Run all the tests:
-   === RUN   TestSlowAdd_Overflow
-   --- PASS: TestSlowAdd_Overflow (1.00s)
-   === RUN   TestSlowAdd
-   --- PASS: TestSlowAdd (1.00s)
+   hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#0-0
+   Changed: []
+
+   Run affected tests:
+
+   Run other tests:
    === RUN   TestSlowSub
    --- FAIL: TestSlowSub (1.00s)
        math_test.go:22: wrong result: 2
-   FAIL (1.032443223s)
+   === RUN   TestSlowAdd
+   --- PASS: TestSlowAdd (1.00s)
+   === RUN   TestSlowAdd_Overflow
+   --- PASS: TestSlowAdd_Overflow (1.00s)
+   FAIL (1.034643007s)
    ```
 
-   Obviously there is one failed test.
-
-   Also, the total test time is `1.032443223s` because the tests run in parallel. When you run the same tests using `go test`, it takes about 3 seconds.
+   * `Changed` and `Run affected tests` are empty since we don't make any changes yet.
+   * One failed test. We will fix this next.
+   * The test time is `1.034643007s` because the tests run in parallel. When you run the same tests using `go test`, it takes about 3 seconds.
 
 2. Fix the bug
 
@@ -113,8 +115,10 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
    When you type `C-c C-h` again, the previous hint is considered.
 
    ```
-   hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#166
-   Found important tests. Run them first:
+   hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#177-177
+   Changed: [SlowSub]
+
+   Run affected tests:
    === RUN   TestSlowSub
    --- PASS: TestSlowSub (1.00s)
 
@@ -123,10 +127,10 @@ Let's assume you just implemented some [functions](https://github.com/ks888/horn
    --- PASS: TestSlowAdd (1.00s)
    === RUN   TestSlowAdd_Overflow
    --- PASS: TestSlowAdd_Overflow (1.00s)
-   PASS (1.037108699s)
+   PASS (1.041285146s)
    ```
 
-   *Based on the hint, hornet runs `TestSlowSub` first because it's affected by the previous change.*
+   *The tool knows you've changed the `SlowSub` function and runs affected tests (`TestSlowSub`) first.*
 
 ## How-to guides
 
