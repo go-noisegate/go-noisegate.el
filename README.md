@@ -1,39 +1,32 @@
-# hornet.el
+# noisegate.el
 
-Run [hornet](https://github.com/ks888/hornet) from Emacs.
+Emacs plugin for [Noise Gate](https://github.com/ks888/noisegate).
 
-## Features
-
-Hornet is the Golang test runner for the speedster.
-
-The core features are:
-* **Change-driven**: by the integration with your editor, hornet knows what changes you made. It runs the tests affected by these changes first.
-* **Tuned for high-speed**: hornet implements some strategies to run the tests faster, including tests in parallel. You may disable these features for safety.
+Noise Gate is the Golang test runner to get faster test results. It selects the tests affected by your recent edits and run them using `go test`.
 
 ## Prerequisites
 
 * Go 1.13 or later
-* Linux or Mac OS X
 
 ## Install
 
-1. Hornet has the server program (`hornetd`) and client program (`hornet`). Install both:
+1. The tool has the server (`gated`) and cli (`gate`). Install both:
+
+   ```sh
+   $ go get -u github.com/ks888/noisegate/cmd/gate && go get -u github.com/ks888/noisegate/cmd/gated
+   ```
+
+2. Copy [`noisegate.el`](https://raw.githubusercontent.com/ks888/noisegate.el/master/noisegate.el) to `load-path` and add the following snippets to your init file.
 
    ```
-   $ go get -u github.com/ks888/hornet/cmd/hornet && go get -u github.com/ks888/hornet/cmd/hornetd
-   ```
-
-2. Copy [`hornet.el`](https://raw.githubusercontent.com/ks888/hornet.el/master/hornet.el) to `load-path` and add the following snippets to your init file.
-
-   ```
-   (require 'hornet)
+   (require 'noisegate)
    ```
 
    Or you may add the repository root to the `load-path`.
 
    ```
    (add-to-list 'load-path "[path to this repository]")
-   (require 'hornet)
+   (require 'noisegate)
    ```
 
    TODO: support MELPA
@@ -41,131 +34,131 @@ The core features are:
 ## Configuration
 
 The typical configuration is:
-* While you edit a file, the plugin updates the list of changes you made.
-* When the file is saved, sends the list of changes to the hornet server.
-* To run the test, type `C-c C-h`, which calls `hornet-test` command. It runs the tests affected by your changes first and then runs the rest.
+* While you edit a file, the plugin updates the list of recent changes.
+* When the file is saved, the `noisegate-hint` command is automatically called. It sends the list of recent changes to the server.
+* To run the test, type `C-c C-t`, which calls the `noisegate-test` command. It runs the tests affected by the recent changes.
+* To run all the tests regardless of recent changes, type `C-c C-a`, which calls the `noisegate-test-all` command.
+
 
 Here is the configuration to achieve this:
 
 ```
 (add-hook 'go-mode-hook
-          (lambda () (add-hook 'after-change-functions 'hornet-record-change)))
+          (lambda () (add-hook 'after-change-functions 'noisegate-record-change)))
 (add-hook 'go-mode-hook
-          (lambda () (add-hook 'after-save-hook 'hornet-hint)))
-(define-key go-mode-map (kbd "C-c C-h") 'hornet-test)
+          (lambda () (add-hook 'after-save-hook 'noisegate-hint)))
+(define-key go-mode-map (kbd "C-c C-t") 'noisegate-test)
+(define-key go-mode-map (kbd "C-c C-a") 'noisegate-test-all)
 ```
 
 The document below assumes you configured your editor in this way.
 
 ## Quickstart
 
-This quickstart shows you how to use hornet to help your coding.
+This quickstart shows you how to use the Noise Gate to get faster test results.
 
 ### Set up
 
-1. Run the server program (`hornetd`) if it's not running yet.
+1. Run the server program (`gated`) if it's not running yet.
 
    ```sh
-   $ hornetd
+   $ gated
    ```
 
-2. Download the sample repository.
+2. Download the tutorial repository.
 
    ```sh
-   $ go get -u github.com/ks888/hornet-tutorial
+   $ go get -u github.com/ks888/noisegate-tutorial
    ```
 
-### Coding
+### Run your tests
 
-Let's assume you just implemented some [functions](https://github.com/ks888/hornet-tutorial/blob/master/math.go) (`SlowAdd` and `SlowSub`) and [tests](https://github.com/ks888/hornet-tutorial/blob/master/math_test.go) (`TestSlowAdd`, `TestSlowAdd_Overflow` and `TestSlowSub`) in the `hornet-tutorial` repository.
+Let's assume you just implemented some [functions](https://github.com/ks888/noisegate-tutorial/blob/master/math.go) (`SlowAdd` and `SlowSub`) and [tests](https://github.com/ks888/noisegate-tutorial/blob/master/math_test.go) (`TestSlowAdd`, `TestSlowAdd_Overflow` and `TestSlowSub`) at the `noisegate-tutorial` repository.
 
-1. Run the tests
+1. Run all the tests
 
-   Open `math.go` in the the repository root and type `C-c C-h` (or call the `hornet-test` command directly). It runs all the tests in the current package.
+   First, check if all the tests are passed. Open `math.go` at the the repository root and type `C-c C-a` (or call the `noisegate-test-all` command directly).
 
    ```
-   hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#0-0
-   Changed: []
-
-   Run affected tests:
-
-   Run other tests:
+   gate test -bypass /Users/yagami/go/src/github.com/ks888/noisegate-tutorial/ -- -v 
+   Run all tests:
+   === RUN   TestSlowAdd
+   --- PASS: TestSlowAdd (1.00s)
+   === RUN   TestSlowAdd_Overflow
+   --- PASS: TestSlowAdd_Overflow (1.00s)
    === RUN   TestSlowSub
    --- FAIL: TestSlowSub (1.00s)
        math_test.go:22: wrong result: 2
-   === RUN   TestSlowAdd
-   --- PASS: TestSlowAdd (1.00s)
-   === RUN   TestSlowAdd_Overflow
-   --- PASS: TestSlowAdd_Overflow (1.00s)
-   FAIL (1.034643007s)
+   FAIL
+   FAIL	github.com/ks888/noisegate-tutorial	3.013s
+   FAIL
    ```
 
-   * `Changed` and `Run affected tests` are empty since we don't make any changes yet.
-   * One failed test. We will fix this next.
-   * The test time is `1.034643007s` because the tests run in parallel. When you run the same tests using `go test`, it takes about 3 seconds.
+   * One failed test. We will fix this soon.
+   * The tool internally calls `go test` and the `-v` option is passed by default. See the [How-to guides](#how-to-guides) section to pass other options.
 
-2. Fix the bug
+2. Change the code
 
-   Fix [the `SlowSub` function](https://github.com/ks888/hornet-tutorial/blob/master/math.go#L12). `return a + b` at the line 12 should be `return a - b`. Then save it.
+   To fix the failed test, change [the `SlowSub` function](https://github.com/ks888/noisegate-tutorial/blob/master/math.go#L12). `return a + b` at the line 12 should be `return a - b`. Then save it.
 
-   While you edit the file, the plugin updates the list of changes you made. When you save the file, it sends the list of changes to the hornet server.
+   * While you edit the file, the plugin updates the list of changes.
+   * When you save the file, the plugin sends the list of changes to the server. The list in this plugin is now empty.
 
-3. Run the tests again
+3. Run the tests affected by the recent changes
 
-   When you type `C-c C-h` again, the previous hint is considered.
+   Let's check if the test is fixed. Type `C-c C-t` (or call the `noisegate-test` command directly).
 
    ```
-   hornet test  /Users/yagami/go/src/github.com/ks888/hornet-tutorial/math.go:#177-177
+   gate test /Users/yagami/go/src/github.com/ks888/noisegate-tutorial/ -- -v 
    Changed: [SlowSub]
-
-   Run affected tests:
    === RUN   TestSlowSub
    --- PASS: TestSlowSub (1.00s)
-
-   Run other tests:
-   === RUN   TestSlowAdd
-   --- PASS: TestSlowAdd (1.00s)
-   === RUN   TestSlowAdd_Overflow
-   --- PASS: TestSlowAdd_Overflow (1.00s)
-   PASS (1.041285146s)
+   PASS
+   ok  	github.com/ks888/noisegate-tutorial	1.008s
    ```
 
-   *The tool knows you've changed the `SlowSub` function and runs affected tests (`TestSlowSub`) first.*
+   * The recent changes are listed at the `Changed: [SlowSub]` line. The list is cleared when all the tests are passed.
+   * Based on the recent changes, the tool selects and runs only the `TestSlowSub` test.
+   * *You get the faster test results (`3.013s` -> `1.008s`)!*
 
 ## How-to guides
 
-### Run tests in sequence
+### Pass options to `go test`
 
-Some tests fail when they are executed in parallel. You can run tests in sequence using the prefix arg: type `C-u C-c C-h` and then enter `--parallel off` or `-p off`.
+Use the prefix arg: type `C-u C-c C-t` and then specify the options (e.g. `--tags tags,list`). Once you specify the options, the same options are passed next time.
 
-### Specify the build tags
+### Run a specific test
 
-You can use the prefix arg: type `C-u C-c C-h` and then enter `--tags tags,list`.
+Type `C-c C-t` when the cursor points to the body of the test function.
 
-### Run the same command as before
-
-It's bothersome to specify the same args again and again. To run the same command, specify `-` as the prefix arg: type `M-- C-c C-h` or `C-u - C-c C-h`.
-
-### Run the specified test
-
-Simply type `C-c C-h` when the cursor points to the body of the target test.
-
-Before the tests run, the `hornet test` adds the position of the current cursor to the changes list, so that we can run the test to which the cursor points first without editing the file.
+The current cursor position is also considered as the recent change so that we can run some test without edit.
 
 ## Command reference
 
-`hornet.el` includes the following interactive commands.
+`noisegate.el` includes the following interactive commands.
 
-### hornet-record-change
+### noisegate-record-change
 
-Record the change (the beginning and end of the region just changed).
+Record the change (= the byte offsets of the changed region).
 
-### hornet-hint
+### noisegate-hint
 
-Sends the list of changes to the hornet server.
+Sends the list of changes to the server. The changes list in the plugin is cleared.
 
-### hornet-test
+### noisegate-test
 
-Runs the tests in the current package based on the previous hints.
+Runs the tests affected by the recent changes.
 
-Use the prefix arg to specify the args of the `hornet hint` cli command: `C-u M-x hornet-test` then you will be prompted. When the prefix arg is `-`, the value from the most recent history is used.
+The current cursor position is also considered as the recent change.
+
+Use the prefix arg to pass the options to `go test`: type `C-u M-x noisegate-test` then enter the options.
+
+### noisegate-test-all
+
+Runs all the tests in the current package regardless of the recent changes.
+
+Use the prefix arg to pass the options to `go test`: type `C-u M-x noisegate-test-all` then enter the options.
+
+## How it works
+
+See [DEVELOPMENT.md](https://github.com/ks888/noisegate/blob/master/DEVELOPMENT.md).
