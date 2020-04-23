@@ -4,7 +4,7 @@
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "24.4"))
 ;; Keywords: languages, go, test
-;; URL: https://github.com/ks888/noisegate.el
+;; URL: https://github.com/go-noisegate/noisegate.el
 
 ;;; Commentary:
 

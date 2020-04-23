@@ -1,6 +1,6 @@
 # noisegate.el
 
-Emacs plugin for [Noise Gate](https://github.com/ks888/noisegate).
+Emacs plugin for [Noise Gate](https://github.com/go-noisegate/noisegate).
 
 Noise Gate is the Golang test runner to get faster test results. It selects the tests affected by your recent edits and run them using `go test`.
 
@@ -13,10 +13,10 @@ Noise Gate is the Golang test runner to get faster test results. It selects the 
 1. The tool has the server (`gated`) and cli (`gate`). Install both:
 
    ```sh
-   $ go get -u github.com/ks888/noisegate/cmd/gate && go get -u github.com/ks888/noisegate/cmd/gated
+   $ go get -u github.com/go-noisegate/noisegate/cmd/gate && go get -u github.com/go-noisegate/noisegate/cmd/gated
    ```
 
-2. Copy [`noisegate.el`](https://raw.githubusercontent.com/ks888/noisegate.el/master/noisegate.el) to `load-path` and add the following snippets to your init file.
+2. Copy [`noisegate.el`](https://raw.githubusercontent.com/go-noisegate/noisegate.el/master/noisegate.el) to `load-path` and add the following snippets to your init file.
 
    ```
    (require 'noisegate)
@@ -65,22 +65,22 @@ This quickstart shows you how to use the Noise Gate to get faster test results.
    $ gated
    ```
 
-2. Download the tutorial repository.
+2. Download the quickstart repository.
 
    ```sh
-   $ go get -u github.com/ks888/noisegate-tutorial
+   $ go get -u github.com/go-noisegate/quickstart
    ```
 
 ### Run your tests
 
-Let's assume you just implemented some [functions](https://github.com/ks888/noisegate-tutorial/blob/master/math.go) (`SlowAdd` and `SlowSub`) and [tests](https://github.com/ks888/noisegate-tutorial/blob/master/math_test.go) (`TestSlowAdd`, `TestSlowAdd_Overflow` and `TestSlowSub`) at the `noisegate-tutorial` repository.
+Let's assume you just implemented some [functions](https://github.com/go-noisegate/quickstart/blob/master/math.go) (`SlowAdd` and `SlowSub`) and [tests](https://github.com/go-noisegate/quickstart/blob/master/math_test.go) (`TestSlowAdd`, `TestSlowAdd_Overflow` and `TestSlowSub`) at the `quickstart` repository.
 
 1. Run all the tests
 
    First, check if all the tests are passed. Open `math.go` at the the repository root and type `C-c C-a` (or call the `noisegate-test-all` command directly).
 
    ```
-   gate test -bypass /Users/yagami/go/src/github.com/ks888/noisegate-tutorial/ -- -v 
+   gate test -bypass /Users/ks888/go/src/github.com/go-noisegate/quickstart/ -- -v 
    Run all tests:
    === RUN   TestSlowAdd
    --- PASS: TestSlowAdd (1.00s)
@@ -90,7 +90,7 @@ Let's assume you just implemented some [functions](https://github.com/ks888/nois
    --- FAIL: TestSlowSub (1.00s)
        math_test.go:22: wrong result: 2
    FAIL
-   FAIL	github.com/ks888/noisegate-tutorial	3.013s
+   FAIL	github.com/go-noisegate/quickstart	3.013s
    FAIL
    ```
 
@@ -99,7 +99,7 @@ Let's assume you just implemented some [functions](https://github.com/ks888/nois
 
 2. Change the code
 
-   To fix the failed test, change [the `SlowSub` function](https://github.com/ks888/noisegate-tutorial/blob/master/math.go#L12). `return a + b` at the line 12 should be `return a - b`. Then save it.
+   To fix the failed test, change [the `SlowSub` function](https://github.com/go-noisegate/quickstart/blob/master/math.go#L12). `return a + b` at the line 12 should be `return a - b`. Then save it.
 
    * While you edit the file, the plugin updates the list of changes.
    * When you save the file, the plugin sends the list of changes to the server. The list in this plugin is now empty.
@@ -109,12 +109,12 @@ Let's assume you just implemented some [functions](https://github.com/ks888/nois
    Let's check if the test is fixed. Type `C-c C-t` (or call the `noisegate-test` command directly).
 
    ```
-   gate test /Users/yagami/go/src/github.com/ks888/noisegate-tutorial/ -- -v 
+   gate test /Users/ks888/go/src/github.com/go-noisegate/quickstart/ -- -v 
    Changed: [SlowSub]
    === RUN   TestSlowSub
    --- PASS: TestSlowSub (1.00s)
    PASS
-   ok  	github.com/ks888/noisegate-tutorial	1.008s
+   ok  	github.com/go-noisegate/quickstart	1.008s
    ```
 
    * The recent changes are listed at the `Changed: [SlowSub]` line. The list is cleared when all the tests are passed.
@@ -161,4 +161,4 @@ Use the prefix arg to pass the options to `go test`: type `C-u M-x noisegate-tes
 
 ## How it works
 
-See [DEVELOPMENT.md](https://github.com/ks888/noisegate/blob/master/DEVELOPMENT.md).
+See [DEVELOPMENT.md](https://github.com/go-noisegate/noisegate/blob/master/DEVELOPMENT.md).
