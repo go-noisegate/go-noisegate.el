@@ -44,11 +44,11 @@ Here is the configuration to achieve this:
 
 ```
 (add-hook 'go-mode-hook
-          (lambda () (add-hook 'after-change-functions 'go-noisegate-record-change)))
-(add-hook 'go-mode-hook
-          (lambda () (add-hook 'after-save-hook 'go-noisegate-hint)))
-(define-key go-mode-map (kbd "C-c C-t") 'go-noisegate-test)
-(define-key go-mode-map (kbd "C-c C-a") 'go-noisegate-test-all)
+          (lambda ()
+            (add-hook 'after-change-functions 'go-noisegate-record-change)
+            (add-hook 'after-save-hook 'go-noisegate-hint)
+            (local-set-key (kbd "C-c C-t") 'go-noisegate-test)
+            (local-set-key (kbd "C-c C-a") 'go-noisegate-test-all)))
 ```
 
 The document below assumes you configured your editor in this way.
