@@ -1,4 +1,4 @@
-# noisegate.el
+# go-noisegate.el
 
 Emacs plugin for [Noise Gate](https://github.com/go-noisegate/noisegate).
 
@@ -16,7 +16,7 @@ Noise Gate is the Golang test runner to get faster test results. It selects the 
    $ go get -u github.com/go-noisegate/noisegate/cmd/gate && go get -u github.com/go-noisegate/noisegate/cmd/gated
    ```
 
-2. Copy [`noisegate.el`](https://raw.githubusercontent.com/go-noisegate/noisegate.el/master/noisegate.el) to `load-path` and add the following snippets to your init file.
+2. Copy [`go-noisegate.el`](https://raw.githubusercontent.com/go-noisegate/go-noisegate.el/master/go-noisegate.el) to `load-path` and add the following snippets to your init file.
 
    ```
    (require 'noisegate)
@@ -135,7 +135,7 @@ The current cursor position is also considered as the recent change so that we c
 
 ## Command reference
 
-`noisegate.el` includes the following interactive commands.
+`go-noisegate.el` includes the following interactive commands.
 
 ### noisegate-record-change
 
