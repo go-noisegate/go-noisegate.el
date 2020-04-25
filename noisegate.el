@@ -24,6 +24,9 @@
 (defvar-local noisegate-changes nil
   "Change list [(begin, end)]")
 
+(defvar noisegate-gate-cmd (noisegate--find-gate-command)
+  "the path to the gate command.")
+
 ;;; mode
 
 (define-derived-mode noisegate-mode compilation-mode "Noise Gate"
@@ -79,6 +82,18 @@ LENGTH is not used."
   "Reset the changes so far."
   (setq noisegate-changes nil))
 
+(defun noisegate--find-gopath ()
+  "Find GOPATH."
+  (with-temp-buffer
+    (call-process "go" nil (current-buffer) nil "env" "GOPATH")
+    ;; trim right
+    (car (split-string (buffer-string)))))
+
+(defun noisegate--find-gate-command ()
+  "Find the gate command."
+  (let ((cmd-in-gopath (concat (noisegate--find-gopath) "/bin/gate")))
+    (if (file-exists-p cmd-in-gopath) cmd-in-gopath "gate")))
+
 ;;; API
 
 ;;;###autoload
@@ -95,7 +110,7 @@ LENGTH is not used."
   (when (and (string-suffix-p ".go" buffer-file-name) noisegate-changes)
     (let ((offsets (noisegate--get-offsets)))
       (noisegate--reset-changes)
-      (start-process "noisegate-hint" "*Messages*" "gate" "hint" (concat buffer-file-name ":" offsets)))))
+      (start-process "noisegate-hint" "*Messages*" noisegate-gate-cmd "hint" (concat buffer-file-name ":" offsets)))))
 
 ;;;###autoload
 (defun noisegate-test ()
@@ -105,8 +120,8 @@ LENGTH is not used."
     (let ((buffer "*Noise Gate*")
           (offset (noisegate--get-offset (list (point) (point)))))
       (noisegate--clear-buffer buffer)
-      (call-process "gate" nil nil nil "hint" (concat buffer-file-name ":" offset))
-      (compilation-start (concat "gate test "  (file-name-directory buffer-file-name) " -- " (noisegate--get-args 'noisegate-history))
+      (call-process noisegate-gate-cmd nil nil nil "hint" (concat buffer-file-name ":" offset))
+      (compilation-start (concat noisegate-gate-cmd " test "  (file-name-directory buffer-file-name) " -- " (noisegate--get-args 'noisegate-history))
                          'noisegate-mode
                          'noisegate--buffer-name)
       (with-current-buffer "*Noise Gate*"
@@ -119,7 +134,7 @@ LENGTH is not used."
   (when (string-suffix-p ".go" buffer-file-name)
     (let ((buffer "*Noise Gate*"))
       (noisegate--clear-buffer buffer)
-      (compilation-start (concat "gate test -bypass " (file-name-directory buffer-file-name) " -- " (noisegate--get-args 'noisegate-history))
+      (compilation-start (concat noisegate-gate-cmd " test -bypass " (file-name-directory buffer-file-name) " -- " (noisegate--get-args 'noisegate-history))
                          'noisegate-mode
                          'noisegate--buffer-name)
       (with-current-buffer "*Noise Gate*"
