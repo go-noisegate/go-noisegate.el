@@ -19,14 +19,14 @@ Noise Gate is the Golang test runner to get faster test results. It selects the 
 2. Copy [`go-noisegate.el`](https://raw.githubusercontent.com/go-noisegate/go-noisegate.el/master/go-noisegate.el) to `load-path` and add the following snippets to your init file.
 
    ```
-   (require 'noisegate)
+   (require 'go-noisegate)
    ```
 
    Or you may add the repository root to the `load-path`.
 
    ```
    (add-to-list 'load-path "[path to this repository]")
-   (require 'noisegate)
+   (require 'go-noisegate)
    ```
 
    TODO: support MELPA
@@ -35,20 +35,20 @@ Noise Gate is the Golang test runner to get faster test results. It selects the 
 
 The typical configuration is:
 * While you edit a file, the plugin updates the list of recent changes.
-* When the file is saved, the `noisegate-hint` command is automatically called. It sends the list of recent changes to the server.
-* To run the test, type `C-c C-t`, which calls the `noisegate-test` command. It runs the tests affected by the recent changes.
-* To run all the tests regardless of recent changes, type `C-c C-a`, which calls the `noisegate-test-all` command.
+* When the file is saved, the `go-noisegate-hint` command is automatically called. It sends the list of recent changes to the server.
+* To run the test, type `C-c C-t`, which calls the `go-noisegate-test` command. It runs the tests affected by the recent changes.
+* To run all the tests regardless of recent changes, type `C-c C-a`, which calls the `go-noisegate-test-all` command.
 
 
 Here is the configuration to achieve this:
 
 ```
 (add-hook 'go-mode-hook
-          (lambda () (add-hook 'after-change-functions 'noisegate-record-change)))
+          (lambda () (add-hook 'after-change-functions 'go-noisegate-record-change)))
 (add-hook 'go-mode-hook
-          (lambda () (add-hook 'after-save-hook 'noisegate-hint)))
-(define-key go-mode-map (kbd "C-c C-t") 'noisegate-test)
-(define-key go-mode-map (kbd "C-c C-a") 'noisegate-test-all)
+          (lambda () (add-hook 'after-save-hook 'go-noisegate-hint)))
+(define-key go-mode-map (kbd "C-c C-t") 'go-noisegate-test)
+(define-key go-mode-map (kbd "C-c C-a") 'go-noisegate-test-all)
 ```
 
 The document below assumes you configured your editor in this way.
@@ -77,7 +77,7 @@ Let's assume you just implemented some [functions](https://github.com/go-noisega
 
 1. Run all the tests
 
-   First, check if all the tests are passed. Open `math.go` at the the repository root and type `C-c C-a` (or call the `noisegate-test-all` command directly).
+   First, check if all the tests are passed. Open `math.go` at the the repository root and type `C-c C-a` (or call the `go-noisegate-test-all` command directly).
 
    ```
    gate test -bypass /Users/ks888/go/src/github.com/go-noisegate/quickstart/ -- -v 
@@ -106,7 +106,7 @@ Let's assume you just implemented some [functions](https://github.com/go-noisega
 
 3. Run the tests affected by the recent changes
 
-   Let's check if the test is fixed. Type `C-c C-t` (or call the `noisegate-test` command directly).
+   Let's check if the test is fixed. Type `C-c C-t` (or call the `go-noisegate-test` command directly).
 
    ```
    gate test /Users/ks888/go/src/github.com/go-noisegate/quickstart/ -- -v 
@@ -137,27 +137,27 @@ The current cursor position is also considered as the recent change so that we c
 
 `go-noisegate.el` includes the following interactive commands.
 
-### noisegate-record-change
+### go-noisegate-record-change
 
 Record the change (= the byte offsets of the changed region).
 
-### noisegate-hint
+### go-noisegate-hint
 
 Sends the list of changes to the server.
 
-### noisegate-test
+### go-noisegate-test
 
 Runs the tests affected by the recent changes.
 
 The current cursor position is also considered as the recent change.
 
-Use the prefix arg to pass the options to `go test`: type `C-u M-x noisegate-test` then enter the options.
+Use the prefix arg to pass the options to `go test`: type `C-u M-x go-noisegate-test` then enter the options.
 
-### noisegate-test-all
+### go-noisegate-test-all
 
 Runs all the tests in the current package regardless of the recent changes.
 
-Use the prefix arg to pass the options to `go test`: type `C-u M-x noisegate-test-all` then enter the options.
+Use the prefix arg to pass the options to `go test`: type `C-u M-x go-noisegate-test-all` then enter the options.
 
 ## How it works
 

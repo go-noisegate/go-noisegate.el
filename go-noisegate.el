@@ -12,20 +12,11 @@
 
 (require 'compile)
 
-;;; groups, customs, and vars
+;;; group
 
 (defgroup go-noisegate nil
   "Noise Gate utility"
   :group 'go)
-
-(defvar go-noisegate-history (list "-v ")
-  "History list for args.")
-
-(defvar-local go-noisegate-changes nil
-  "Change list [(begin, end)]")
-
-(defvar go-noisegate-gate-cmd (go-noisegate--find-gate-command)
-  "The path to the gate command.")
 
 ;;; mode
 
@@ -93,6 +84,18 @@ LENGTH is not used."
   "Find the gate command."
   (let ((cmd-in-gopath (concat (go-noisegate--find-gopath) "/bin/gate")))
     (if (file-exists-p cmd-in-gopath) cmd-in-gopath "gate")))
+
+
+;;; vars
+
+(defvar go-noisegate-history (list "-v ")
+  "History list for args.")
+
+(defvar-local go-noisegate-changes nil
+  "Change list [(begin, end)]")
+
+(defvar go-noisegate-gate-cmd (go-noisegate--find-gate-command)
+  "The path to the gate command.")
 
 ;;; API
 
