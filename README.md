@@ -102,7 +102,7 @@ Let's assume you just implemented some [functions](https://github.com/go-noisega
    To fix the failed test, change [the `SlowSub` function](https://github.com/go-noisegate/quickstart/blob/master/math.go#L12). `return a + b` at the line 12 should be `return a - b`. Then save it.
 
    * While you edit the file, the plugin updates the list of changes.
-   * When you save the file, the plugin sends the list of changes to the server. The list in this plugin is now empty.
+   * When you save the file, the plugin sends the list of changes to the server.
 
 3. Run the tests affected by the recent changes
 
@@ -143,7 +143,7 @@ Record the change (= the byte offsets of the changed region).
 
 ### noisegate-hint
 
-Sends the list of changes to the server. The changes list in the plugin is cleared.
+Sends the list of changes to the server.
 
 ### noisegate-test
 
