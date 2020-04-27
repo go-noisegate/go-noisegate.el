@@ -2,8 +2,6 @@
 
 Emacs plugin for [Noise Gate](https://github.com/go-noisegate/noisegate).
 
-Noise Gate is the Golang test runner to get faster test results. It selects the tests affected by your recent edits and run them using `go test`.
-
 ## Prerequisites
 
 * Go 1.13 or later
