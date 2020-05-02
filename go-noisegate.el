@@ -61,8 +61,8 @@
       (setq buffer-read-only nil)
       (erase-buffer))))
 
-(defun go-noisegate--buffer-name (mode-name)
-  "Return the buffer name.  MODE-NAME is not used."
+(defun go-noisegate--buffer-name (_mode-name)
+  "Return the buffer name."
   "*Noise Gate*")
 
 (defun go-noisegate--get-args (history)
