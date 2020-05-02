@@ -1,4 +1,4 @@
-;;; go-noisegate.el --- Emacs plugin for Noise Gate -*- lexical-binding: t; -*-
+;;; go-noisegate.el --- Run Golang tests with Noise Gate -*- lexical-binding: t; -*-
 
 ;; Author: The Noise Gate Authors
 ;; Version: 0.1.0
@@ -22,9 +22,10 @@
 
 ;;; Commentary:
 
-;; Emacs plugin for Noise Gate.
+;; Run Golang tests with Noise Gate.
 ;;
-;; Noise Gate is the Golang test runner to get faster test results. It selects the tests affected by your recent edits and run them using `go test`.
+;; Noise Gate is the Golang test runner to get faster test results.
+;; It selects the tests affected by your recent edits and run them using `go test`.
 ;;
 ;; Check https://github.com/go-noisegate/go-noisegate.el for details.
 
