@@ -1,5 +1,7 @@
 # go-noisegate.el
 
+[![MELPA](https://melpa.org/packages/go-noisegate-badge.svg)](https://melpa.org/#/go-noisegate)
+
 Emacs plugin for [Noise Gate](https://github.com/go-noisegate/noisegate).
 
 ## Prerequisites
@@ -14,7 +16,17 @@ Emacs plugin for [Noise Gate](https://github.com/go-noisegate/noisegate).
    $ go get -u github.com/go-noisegate/noisegate/cmd/gate && go get -u github.com/go-noisegate/noisegate/cmd/gated
    ```
 
-2. Copy [`go-noisegate.el`](https://raw.githubusercontent.com/go-noisegate/go-noisegate.el/master/go-noisegate.el) to `load-path` and add the following snippets to your init file.
+2. Install go-noisegate.el
+
+   **MELPA (recommended)**
+
+   ```
+   M-x package-install go-noisegate
+   ```
+
+   **Manual**
+
+   Copy [`go-noisegate.el`](https://raw.githubusercontent.com/go-noisegate/go-noisegate.el/master/go-noisegate.el) to `load-path` and add the following snippets to your init file.
 
    ```
    (require 'go-noisegate)
@@ -26,8 +38,6 @@ Emacs plugin for [Noise Gate](https://github.com/go-noisegate/noisegate).
    (add-to-list 'load-path "[path to this repository]")
    (require 'go-noisegate)
    ```
-
-   TODO: support MELPA
 
 ## Configuration
 
